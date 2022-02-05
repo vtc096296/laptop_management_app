@@ -1,0 +1,154 @@
+{% extends 'layout.html' %}
+
+<!-- Left column -->
+{% block column1 %}
+<div class="list-group" id="cate_list">
+    <span class="list-group-item list-group-item-action active">Category</span>{% for c in cate %}
+    <a href="#" class="list-group-item list-group-item-action list-group-item-dark" name="cate_list" cid="{{c[0]}}">{{c[1]}}</a> {% endfor %}
+</div>
+{% endblock column1%}
+
+<!-- Middel column -->
+{% block column2 %}
+<div class="container-fluid">
+    <div class="nav justify-content-center">
+        <span class="navbar-brand mb-0 h1" style="text-align:center"><b>PRODUCTS LIST</b></span>
+    </div>
+    <div class="row" id="column2">
+        {% for p in pro %}
+        <div class="col-lg-4" n="{{p[1]}}" name="p" cid="{{p[7]}}">
+            <a href="/home/product-info-table/{{p[0]}}" class="btn btn-light">
+                <div class="card" style="width: 16.1rem;">
+                    <img src="{{p[4]}}" alt="product-image" style="width:255px; height: 200px;">
+                    <div class="card text-white bg-success mb-3">
+                        <div class="card-header" style="font-size:large"><b>{{p[1]}}</b></div>
+                        <div class="card-body">
+                            <ul class="list-group">
+                                <li class="list-group-item list-group-item-primary"><b>Buy</b> : {{p[2]}} VND</li>
+                                <li class="list-group-item list-group-item-primary"><b>Sell</b> : {{p[3]}} VND</li>
+                                <li class="list-group-item list-group-item-primary"><b>Quantity</b> : {{p[5]}}</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </a>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock column2%}
+
+<!-- Right column -->
+{% block column3 %}
+<div class="list-group">
+    <span class="list-group-item list-group-item-action active">Action List</span>
+    <a href="#" class="list-group-item list-group-item-action" data-toggle="modal" data-target="#create_product">Create Product</a>
+    <a href="/home/product-list" class="list-group-item list-group-item-action">Products list</a>
+    <a href="/home/category-list" class="list-group-item list-group-item-action">Category List</a>
+</div>
+{% endblock column3 %}
+
+<!-- Modal -->
+
+<!-- Create Product modal -->
+{%block modal%}
+<div class="modal" id="create_product">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">New Product</h3>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+
+            <div class="modal-body">
+                <form action="/home/create-product" method="POST" name="cre_pro_frm" id="cre_pro_frm" enctype="multipart/form-data">
+                    <div class="form-group">
+                        <label><b>Category</b></label>
+                        <select name="cate_sel" id="cate_sel" class="custom-select mr-sm-2">
+                            {% for c in cate %}
+                                <option class ="opt" name="cate_opt" value="{{c[0]}}">{{c[1]}}</option>
+                            {% endfor %}
+                        </select>
+                        <label><b>Product Name</b></label>
+                        <input class="form-control" type="text" name="pro_name" id="pro_name">
+                        <label><b>Buy Price</b></label>
+                        <input class="form-control" type="number" name="buy_price" id="buy_price">
+                        <label><b>Sell Price</b></label>
+                        <input class="form-control" type="number" name="sell_price" id="sell_price">
+                        <label><b>Quantity</b></label>
+                        <input class="form-control" type="number" name="quantity" id="quantity">
+                        <label><b>Product Image (.jpg, .jpeg, .png)</b></label>
+                        <input class="form-control-file" type="file" name="pro_img" id="pro_img" accept=".jpg,.png,.jpeg">
+                        <!-- <label><b>Product Specification (JSON file)</b></label>
+                        <input class="form-control-file" type="file" name="pro_spec" id="pro_spec" accept=".json"> -->
+                    </div>
+                    <div class="form-group">
+                        <button class="btn btn-primary" type="button" id="cre_pro_btn" rid="1" disabled>Save change</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock modal%}
+
+<!-- Script -->
+{% block script%}
+<script type="text/javascript">
+    // Submit Create Product Form
+    $(cre_pro_btn).click(function() {
+        if ($(pro_name).val() != '' && $(buy_price).val() != '' && $(sell_price).val() != '' && $(quantity).val() != '') {
+
+            var nl = $(column2).children();
+            var n = $(pro_name).val();
+            var atr = 'n';
+            var v = checkExtFile($(pro_img).val(), ["jpg", "png", "jpeg"])
+            var x = checkExisted(n, nl, atr);
+
+            if (x == 1) {
+                alert('Product is exited !!! Please create other name');
+            } else if (v == 0) {
+                alert('Image File must be .PNG .JPEG .JPG')
+            } else {
+                $(cre_pro_frm).submit();
+            }
+
+        } else {
+            alert("Please fill in lack infomation");
+        }
+    })
+
+    // Hidden product not in category
+    $("a[name='cate_list']").click(function() {
+        $("#column2 div[name='p']").attr("hidden", false)
+        a = $(this).attr("cid")
+        nl = $(column2).children()
+
+        for (i = 0; i < nl.length; i++) {
+            cid = $(nl[i]).attr("cid")
+            if (cid != a) {
+                $(`div[cid=${cid}]`).attr("hidden", true)
+            }
+        }
+    })
+
+    // Search
+    $(search_btn).click(function(e) {
+        e.preventDefault()
+        var v = ($(search_input).val()).toLowerCase()
+        
+        for (i of $(column2).children()) {
+            var result = ($(i).attr('n')).toLowerCase()
+            console.log(result)
+            if (result.search(v) >= 0) {
+                $(i).attr('hidden', false)
+            } else {
+                $(i).attr('hidden', true)
+            }
+        }
+    })
+</script>
+{% endblock script%}

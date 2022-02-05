@@ -1,0 +1,49 @@
+{
+    "Spec": {
+        "Bộ xử lý": {
+            "Công nghệ CPU": "Đang cập nhật",
+            "Loại CPU": "Đang cập nhật",
+            "Tốc độ CPU": "Đang cập nhật",
+            "Tốc độ tối đa": "Đang cập nhật"
+        },
+        "Bộ nhớ RAM, Ổ cứng": {
+            "RAM": "Đang cập nhật",
+            "Loại RAM": "Đang cập nhật",
+            "Tốc độ Bus RAM": "Đang cập nhật",
+            "Hỗ trợ RAM tối đa": "Đang cập nhật",
+            "Ổ cứng": "Đang cập nhật"
+        },
+        "Màn hình": {
+            "Kích thước màn hình": "Đang cập nhật",
+            "Độ phân giải": "Đang cập nhật",
+            "Công nghệ màn hình": "Đang cập nhật",
+            "Màn hình cảm ứng": "Đang cập nhật"
+        },
+        "Đồ họa và Âm thanh": {
+            "Thiết kế card": "Đang cập nhật",
+            "Card đồ họa": "Đang cập nhật",
+            "Công nghệ âm thanh": "Đang cập nhật"
+        },
+        "Cổng kết nối & tính năng mở rộng": {
+            "Cổng giao tiếp": "Đang cập nhật",
+            "Kết nối không dây": "Đang cập nhật",
+            "Khe đọc thẻ nhớ": "Đang cập nhật",
+            "Ổ đĩa quang": "Đang cập nhật",
+            "Webcam": "Đang cập nhật",
+            "Đèn bàn phím": "Đang cập nhật",
+            "Tính năng khác": "Đang cập nhật"
+        },
+        "PIN & ADAPTER SẠC": {
+            "Loại PIN": "Đang cập nhật",
+            "Thông tin Pin": "Đang cập nhật"
+        },
+        "Hệ điều hành": {
+            "Hệ điều hành": "Đang cập nhật"
+        },
+        "Kích thước & trọng lượng": {
+            "Kích thước": "Đang cập nhật",
+            "Trọng lượng": "Đang cập nhật",
+            "Chất liệu": "Đang cập nhật"
+        }
+    }
+}

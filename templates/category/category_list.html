@@ -1,0 +1,183 @@
+{% extends 'layout.html' %}
+
+<!-- Middle Column -->
+{% block column2 %}
+<div class="container-fluid">
+    <table class="table table-bordered table-hover">
+        <thead>
+            <tr class="table-success">
+                <th style="text-align: center;">Category name</th>
+                <th style="text-align: center;">Edit name</th>
+                <th style="text-align: center;">Delete</th>
+            </tr>
+        </thead>
+        <tbody id="cate_sheet">
+            {% for i in cate %}
+            <tr class="table-info" name="{{i[0]}}">
+                <td style="text-align: center;">{{i[1]}}</td>
+                <td style="text-align: center;">
+                    <button class="btn btn-success" name="edit_cate_btn" data-toggle="modal" data-target="#edit_category" cate_id="{{i[0]}}" cate_name="{{i[1]}}" rid="4" disabled>
+                        Edit
+                    </button>
+                </td>
+                <td style="text-align: center;">
+                    <button class="btn btn-danger" name="del_cate" cate_id="{{i[0]}}" rid="7" disabled>Delete</button>
+                </td>
+            </tr>
+            {% endfor%}
+        </tbody>
+    </table>
+</div>
+{% endblock column2%}
+
+<!-- Right Column -->
+{% block column3%}
+<div>
+    <span class="list-group-item list-group-item-action active">Action List</span>
+    <a href="#" class="list-group-item list-group-item-action" data-toggle="modal" data-target="#create_category">Create new category</a>
+    <a href="/home/category-list" class="list-group-item list-group-item-action">Category List</a>
+    <a href="/home/product-list" class="list-group-item list-group-item-action">Products list</a>
+</div>
+{% endblock column3 %}
+
+<!-- Modal -->
+{% block modal%}
+<!-- Create category modal -->
+<div class="modal" id="create_category">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">New Category</h3>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+
+            <div class="modal-body">
+                <form method="POST" name="cre_cate">
+                    <div class="form-group">
+                        <label>Category</label>
+                        <input class="form-control" type="text" name="cate_name">
+                    </div>
+                    <div class="form-group">
+                        <button class="btn btn-primary" rid="6" disabled>CREATE</button>
+                    </div>
+                </form>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Edit category modal -->
+<div class="modal" id="edit_category">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Edit Category name</h3>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form method="POST" name="edit_cate_frm">
+                    <div class="form-group">
+                        <label>New Name</label>
+                        <input class="form-control" type="text" name="new_name">
+                        <input type="text" name="cate_id" hidden>
+                        <input type="text" name="old_name" hidden>
+                    </div>
+                    <div class="form-group">
+                        <button class="btn btn-primary">Save change</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock modal%}
+
+<!-- Script -->
+{% block script%}
+<script type="text/javascript">
+    // Create new category
+    $(cre_cate).submit(function(ev) {
+        ev.preventDefault()
+        $.post('/home/createcategory', {
+            cate_name: $(cre_cate['cate_name']).val()
+        }, function(d) {
+            if (d.info) {
+                alert(d.info)
+            } else if (d.error) {
+                alert(d.error)
+            } else {
+                $(cate_sheet).append(
+                    `<tr class="table-info" name=${d['cate_id']}>
+                        <td style="text-align: center;">${d['cate_name']}</td>
+                        <td style="text-align: center;">
+                            <button class="btn btn-success" name="edit_cate_btn" data-toggle="modal" data-target="#edit_category" cate_id=${d['cate_id']} cate_name=${d['cate_name']}>
+                                Edit
+                            </button>
+                        </td>
+                        <td style="text-align: center;">
+                            <button class="btn btn-danger" name="del_cate" cate_id=${d['cate_id']}>Delete</button>
+                        </td>
+                    </tr>`
+                )
+                $(create_category).modal('hide')
+            }
+        })
+    })
+
+    //Delete category
+    $("#cate_sheet").delegate("button[name='del_cate']", "click", function() {
+        if (confirm("Are you sure ?")) {
+            $.post('/home/delete-category-name', {
+                cate_id: $(this).attr('cate_id')
+            }, function(d) {
+                if (d.cate_id) {
+                    $(`tr[name= ${d['cate_id']}]`).remove()
+                } else if (d.error) {
+                    alert(d.error)
+                }
+            })
+        }
+    });
+
+    //Edit category
+    // Click Edit button
+    $("#cate_sheet").delegate("button[name='edit_cate_btn']", "click", function() {
+        var i = $(this).attr("cate_id");
+        var n = $(this).attr("cate_name");
+        $("input[name='new_name']").val(n);
+        $("input[name='old_name']").val(n);
+        $("input[name='cate_id']").val(i);
+    })
+
+    // Do Edit
+    $(edit_cate_frm).submit(function(ev) {
+        ev.preventDefault();
+        n = $("input[name='new_name']").val();
+        o = $("input[name='old_name']").val();
+        i = $("input[name='cate_id']").val();
+        if (n === o) {
+            $(edit_category).modal('hide');
+        } else {
+            $.post("/home/edit-category-name", {
+                cate_id: i,
+                cate_name: n
+            }, function(d) {
+                if (d.cate_id) {
+                    $(`tr[name=${d['cate_id']}]`).children()[0].innerHTML = d['cate_name'];
+                    $("button[name='edit_cate_btn']").attr("cate_name", d['cate_name'])
+                    $(edit_category).modal('hide');
+                } else if (d.info) {
+                    alert(d.info);
+                } else if (d.error) {
+                    alert(d.error);
+                };
+            })
+        }
+    })
+</script>
+{% endblock script%}

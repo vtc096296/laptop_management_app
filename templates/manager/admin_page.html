@@ -1,0 +1,157 @@
+{% extends 'admin_layout.html'%}
+<!-- Tilte block-->
+{% block title %}Admin Page{% endblock title %}
+<!-- End title block -->
+
+
+<!-- Content block -->
+{% block content%}
+<br>
+<table class="table table-hover table-dark">
+    <thead>
+        <tr>
+            <th scope="col">No.</th>
+            <th scope="col">Username</th>
+            <th scope="col">Role</th>
+            <th scope="col">Delete</th>
+            <th scope="col">Reset Password</th>
+        </tr>
+    </thead>
+    <tbody name="user_list">
+        {% for i in ml[1:] %}
+        <tr>
+            <td>{{ml.index(i)}}</td>
+            <td name="user_name" v="{{i[1]}}">{{i[1]}}</td>
+            <td>
+                <button class="btn btn-outline-primary" data-toggle="modal" data-target="#edit_role" id="edit_role_btn" v="{{i[0]}}">EDIT</button>
+            </td>
+            <td>
+                <form action="/manager/delete-user/{{i[1]}}" method="POST">
+                    <input type="hidden" name="uid" value="{{i[0]}}">
+                    <button class="btn btn-outline-danger">DELETE</button>
+                </form>
+            </td>
+            <td>
+                <form action="/manager/reset-password/{{i[1]}}" method="POST">
+                    <button class="btn btn-outline-warning">RESET</button>
+                </form>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+<div id="rid">
+    {% for v in user_role%}
+    <input type="hidden" value="{{v[0]}}" name="rid"> {% endfor %}
+</div>
+
+{% with messages = get_flashed_messages()%} {% if messages %} {% for msg in messages%}
+<script>
+    alert('{{msg}}')
+</script>
+{% endfor %} {% endif %} {% endwith%} {% endblock content %}
+
+<!-- End content block -->
+
+
+<!-- Modal block -->
+<!-- New user modal -->
+{% block modal %}
+<div class="modal fade" id="new_user">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">New User</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form action="/manager/add-user" method="post" name="new_user_frm">
+                    <div class="form-group">
+                        <label>Username</label>
+                        <input class="form-control" type="text" name="usr">
+                    </div>
+                    <div class="form-group">
+                        <label>Password</label>
+                        <input class="form-control " type="password" name="pwd">
+                    </div>
+                    {% for a in arr %}
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" value="{{a[0]}}" name="role">
+                        <label class="form-check-label">{{a[1]}}</label>
+                    </div>
+                    {% endfor %}
+                    <div>
+                        <button class="btn btn-primary" id="create_user">CREATE</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- End New User modal -->
+
+<!-- Edit role modal -->
+<div class="modal fade" id="edit_role">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Edit Role: {{session.get('user_info')['username']}}</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form action="/manager/edit-user-role" method="post" name="edit_role_frm">
+                    {% for role in role_list %}
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" value="{{role[0]}}" name="role">
+                        <label class="form-check-label">{{role[1]}}</label>
+                    </div>
+                    {% endfor %}
+                    <input type="hidden" name="uid_in_role">
+                    <div>
+                        <button class="btn btn-primary">SAVE CHANGE</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- End Edit role modal -->
+{% endblock modal%}
+<!-- End modal block -->
+
+
+<!-- Script Block -->
+{% block script%}
+<script>
+    $(create_user).click(function(e) {
+        e.preventDefault()
+        if ($("input[name='usr']").val() == '' || $("input[name='pwd']").val() == '') {
+            alert("Username or Password is empty");
+        } else {
+            $(new_user_frm).submit();
+        }
+
+
+    })
+
+    $(edit_role_btn).click(function() {
+        $("input[name= 'role']").attr("checked", false)
+
+        var uid = $(this).attr('v');
+        console.log(uid)
+
+        $.post(`/manager/user-role/${uid}`, function(d) {
+            for (i of d.user_role) {
+                $(`input[value= ${i[0]}]`).attr("checked", true)
+            }
+            $("input[name= 'uid_in_role']").attr("value", d.uid)
+        })
+    })
+</script>
+{% endblock%}
+<!-- End Script Block -->

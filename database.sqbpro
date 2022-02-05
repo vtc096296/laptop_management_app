@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?><sqlb_project><db path="E:/CODE_and_SIMULATION/PYTHON/Tutorial/flask_tutorial/do_an_cuoi/database.db" readonly="0" foreign_keys="1" case_sensitive_like="0" temp_store="0" wal_autocheckpoint="1000" synchronous="2"/><attached/><window><main_tabs open="structure browser pragmas query" current="3"/></window><tab_structure><column_width id="0" width="300"/><column_width id="1" width="0"/><column_width id="2" width="100"/><column_width id="3" width="1898"/><column_width id="4" width="0"/><expanded_item id="0" parent="1"/><expanded_item id="1" parent="1"/><expanded_item id="2" parent="1"/><expanded_item id="3" parent="1"/></tab_structure><tab_browse><current_table name="4,4:mainRole"/><default_encoding codec=""/><browse_table_settings><table schema="main" name="Category" show_row_id="0" encoding="" plot_x_axis="" unlock_view_pk="_rowid_"><sort><column index="2" mode="0"/></sort><column_widths><column index="1" value="81"/><column index="2" value="103"/></column_widths><filter_values/><conditional_formats/><row_id_formats/><display_formats/><hidden_columns/><plot_y_axes/><global_filter/></table><table schema="main" name="ManagerAccount" show_row_id="0" encoding="" plot_x_axis="" unlock_view_pk="_rowid_"><sort><column index="1" mode="0"/></sort><column_widths><column index="1" value="78"/><column index="2" value="72"/><column index="3" value="283"/></column_widths><filter_values/><conditional_formats/><row_id_formats/><display_formats/><hidden_columns/><plot_y_axes/><global_filter/></table><table schema="main" name="Products" show_row_id="0" encoding="" plot_x_axis="" unlock_view_pk="_rowid_"><sort/><column_widths><column index="1" value="72"/><column index="2" value="176"/><column index="3" value="137"/><column index="4" value="148"/><column index="5" value="142"/><column index="6" value="173"/><column index="7" value="242"/></column_widths><filter_values/><conditional_formats/><row_id_formats/><display_formats/><hidden_columns/><plot_y_axes/><global_filter/></table><table schema="main" name="Role" show_row_id="0" encoding="" plot_x_axis="" unlock_view_pk="_rowid_"><sort/><column_widths><column index="1" value="133"/><column index="2" value="409"/></column_widths><filter_values/><conditional_formats/><row_id_formats/><display_formats/><hidden_columns/><plot_y_axes/><global_filter/></table><table schema="main" name="UserInRole" show_row_id="0" encoding="" plot_x_axis="" unlock_view_pk="_rowid_"><sort/><column_widths><column index="1" value="40"/><column index="2" value="49"/><column index="3" value="50"/></column_widths><filter_values/><conditional_formats/><row_id_formats/><display_formats/><hidden_columns/><plot_y_axes/><global_filter/></table><table schema="main" name="sqlite_sequence" show_row_id="0" encoding="" plot_x_axis="" unlock_view_pk="_rowid_"><sort/><column_widths><column index="1" value="198"/><column index="2" value="189"/></column_widths><filter_values/><conditional_formats/><row_id_formats/><display_formats/><hidden_columns/><plot_y_axes/><global_filter/></table></browse_table_settings></tab_browse><tab_sql><sql name="SQL 1">CREATE TABLE Category(
+	CategoryId INTEGER PRIMARY KEY AUTOINCREMENT,
+	CategoryName NVARCHAR NOT NULL
+);
+GO;
+CREATE TABLE Products(
+	ProductId INTEGER PRIMARY KEY AUTOINCREMENT,
+	ProductName NVARCHAR NOT NULL UNIQUE,
+	BuyPrice INTEGER,
+	SellPrice INTEGER,
+	Image TEXT,
+	Quantity INTEGER,
+	Specification TEXT,
+	CategoryId INTEGER NOT NULL,
+	FOREIGN KEY (CategoryId)
+	REFERENCES Category(CategoryId)
+		ON DELETE CASCADE
+		ON UPDATE CASCADE
+);
+
+CREATE TABLE ManagerAccount(
+	ManagerId INTEGER PRIMARY KEY AUTOINCREMENT,
+	UserName NVARCHAR NOT NULL UNIQUE,
+	PassWord NVARCHAR NOT NULL
+); 
+
+CREATE TABLE Role(
+	RoleId INTEGER PRIMARY KEY,
+	RoleName NVARCHAR
+);
+
+CREATE TABLE UserInRole(
+	Id INTEGER PRIMARY KEY AUTOINCREMENT,
+	RoleId INTEGER,
+	UserId INTEGER
+);
+DROP TABLE Products
+ALTER TABLE Products
+RENAME COLUMN Image TO ImageLink
+
+DELETE FROM Products
+
+SELECT * FROM Products JOIN Category ON Products.CategoryId = Category.CategoryId;
+DELETE FROM Products WHERE ProductId = '16'
+
+INSERT INTO ManagerAccount(UserName, PassWord) VALUES('admin', '04f4b1f1030cd0eeb97cbd2068f4ee10')
+INSERT INTO Role(RoleName) VALUES 
+	('CREATE PRODUCT'),
+	('EDIT PRODUCT INFO'),
+	('EDIT PRODUCT SPECIFICATION'),
+	('EDIT CATEGORY')
+INSERT INTO UserInRole(RoleId, UserId) VALUES
+	(1,1),
+	(2,1),
+	(3,1),
+	(4,1)
+INSERT INTO Role(RoleName) VALUES ('Admin')
+INSERT INTO UserInRole(RoleId, UserId) VALUES (5,1)
+
+ALTER TABLE UserInRole
+ADD COLUMN Checked INTEGER DEFAULT 0
+
+UPDATE UserInRole SET Checked = 1 WHERE UserId = 1
+UPDATE Role SET RoleName = 'ADMIN' WHERE RoleId = 5
+SELECT Role.*, UserInRole.UserId, UserInRole.Checked FROM Role JOIN UserInRole ON Role.RoleId = UserInRole.RoleId AND UserInRole.UserId = 1 AND Checked =1
+
+SELECT * FROM Role
+DELETE FROM UserInRole WHERE UserId = 18
+
+INSERT INTO Role(RoleName) VALUES ('DELETE PRODUCT')
+
+INSERT INTO UserInRole(RoleId, UserId, Checked) VALUES (6,1,1), (7,1,1), (8,1,1)
+			
+INSERT INTO Products(ProductName, BuyPrice, SellPrice, ImageLink, Quantity, Specification, CategoryId) VALUES 
+('Asus VivoBook X441MA N5000 (GA024T)',6830500,7190000,'/static/image/products/default.png',20,'static/specification_file/482e130bc8ad12cb06909984fcbf2ccbb0d7c11e.json',20), 
+('Asus VivoBook A412FA i3 8145U (EK342T)',11865500,12490000,'/static/image/products/default.png',20,'static/specification_file/7635ad5dd2141ed87b9394571437512536dda1d6.json',20), 
+('Asus VivoBook S14 S431 i7 8565U (EB131T)',20890500,21990000,'/static/image/products/default.png',20,'static/specification_file/e6b6427240c57f855b1d675cd9d3d330616fdd6c.json',20), 
+('Asus VivoBook A512FL i5 10210U (EJ569T)',18040500,18990000,'/static/image/products/default.png',20,'static/specification_file/73cb15018a7e9825e479818fd7f7c0573704bb9c.json',20), 
+('Asus VivoBook A412FA i5 10210U (EK738T)',16140500,16990000,'/static/image/products/default.png',20,'static/specification_file/41abb216251da56b565348a328eda977505c0d2d.json',20), 
+('Asus VivoBook A512FA i5 10210U (EJ1734T)',16425500,17290000,'/static/image/products/default.png',20,'static/specification_file/a91c3f134d50c685ccce66760b2643aa596fca94.json',20)
+			</sql><current_tab id="0"/></tab_sql></sqlb_project>
